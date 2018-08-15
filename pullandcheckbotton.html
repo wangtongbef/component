@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>拖动组件与点击选中与否组件</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"><!--如不加此行则测出的clientWidth为980-->
+		<script>
+			var fun = function (doc, win) {
+			    var docEl = doc.documentElement,
+			        resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+			        recalc = function () {
+			            var clientWidth = docEl.clientWidth; 
+			            if (!clientWidth) return;
+			            //这里是假设在750px宽度设计稿的情况下，1rem = 100px；
+			            //可以根据实际需要修改
+			            docEl.style.fontSize = 100 * (clientWidth / 750) + 'px';
+			        };
+			    if (!doc.addEventListener) return;
+			    win.addEventListener(resizeEvt, recalc, false);
+			    doc.addEventListener('DOMContentLoaded', recalc, false);
+			}
+			fun(document, window);
+		</script>
+		<style>
+			html,body{
+				background-color: rgb(238,238,238);
+				width: 100%;
+				font-size: 50px;
+			}
+			body{
+				margin:0
+			}
+			.wakeUp,
+			.report{
+				width:100%;
+				height:2.9rem;
+				background-color: #fff;
+				padding-top: 0.8rem;
+				margin-bottom: 0.2rem;
+			}
+			.title{
+				font-size: 0.4rem;
+				color: rgb(17,17,17);
+				height: 0.4rem;
+				width: calc(100% - 0.4rem);
+				line-height: 0.4rem;
+				padding-left: 0.4rem;
+				margin-bottom: 0.2rem;
+			}
+			.detail{
+				font-size: 0.28rem;
+				color: rgb(112,112,112);
+				height: 0.28rem;
+				width: calc(100% - 0.7rem);
+				line-height: 0.28rem;
+				padding-left: 0.7rem;
+			}
+			.time,
+			.seconds{
+				width:calc(100% - 0.8rem);
+				height: 0.4rem;
+				margin-top: 0.24rem;
+				line-height: 0.4rem;
+				font-size: 0.4rem;
+				color: rgb(17,17,17);
+				text-align: right;
+				padding-right: 0.8rem;
+			}
+			.strip,
+			.stripT{
+				width:5.5rem;
+				height:0.08rem;
+				margin:0.5rem 1rem 0 1rem;
+				background-color: rgb(204,204,204);
+				border-radius: 0.04rem;
+				position: relative;
+			}
+			.chooseStrip,
+			.chooseStripT{
+				position: absolute;
+				top:0;
+				left:0;
+				height:0.08rem;
+				border-radius: 0.04rem;
+				background-color: rgb(110,209,255);
+			}
+			.chooseStrip{
+				width:2.75rem;
+			}
+			.chooseStripT{
+				width:1.8333rem;
+			}
+			.chooseStripCirc,
+			.chooseStripCircT{
+				width:0.48rem;
+				height:0.48rem;
+				position: absolute;
+				top:-0.2rem;
+			}
+			.chooseStripCirc{
+				left:2.51rem;
+			}
+			.chooseStripCircT{
+				left:1.5933rem;
+			}
+			.setUp{
+				width:100%;
+				height:1.9rem;
+				background-color: #fff;
+				margin-top: 0.4rem;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+			.setUptitle{
+				width:2rem;
+				height:1.9rem;
+				line-height: 1.9rem;
+				font-size: 0.4rem;
+				color: rgb(17,17,17);
+				padding-left: 0.4rem;
+			}
+			.Button,
+			.ButtonShadow{
+				width:0.8rem;
+				height:0.2rem;
+				border-radius: 0.1rem;
+				background-color: #e6e6e6;
+				margin-right: 0.4rem;
+				box-shadow: 0 0.02rem 0.05rem rgba(0,0,0,0.2) inset;
+				position: relative;
+			}
+			.Button{
+				width:0.8rem;
+				background-color: #e6e6e6;
+			}
+			.ButtonShadow{
+				width:0;
+				background-color: #6ed1ff;
+			}
+			#ButtonCir{
+				width:0.56rem;
+				height:0.56rem;
+				background-color: #fff;
+				border-radius: 0.28rem;
+				box-shadow: 0 0 0.12rem 0.02rem rgba(34,34,34,0.2);
+				position: absolute;
+				top:-0.18rem;
+				left:-0.28rem
+			}
+			#submit{
+				width:6.4rem;
+				height:1rem;
+				line-height: 1rem;
+				text-align: center;
+				font-size: 0.32rem;
+				border-radius: 0.2rem;
+				margin: 0.6rem 0.55rem;
+				background-color: rgb(167,167,167);
+				color: #fff;
+			}
+			.prompt{
+				width:3rem;
+				height:0.8rem;
+				border-radius: 0.04rem;
+				background-color: rgba(0,0,0,0.25);
+				line-height: 0.8rem;
+				text-align: center;
+				color:#fff;
+				font-size: 0.32rem;
+				position: fixed;
+				left:2.25rem;
+				bottom: 3rem;
+				display: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="wakeUp">
+			<div class='title'>休眠唤醒</div>
+			<div class='detail'>一段时间后，设备唤醒</div>
+			<div class='time'>12H</div>
+			<div class='strip'>
+				<div class="chooseStrip">
+					<img class='chooseStripCirc' src="img/circle_blue.png"/>
+				</div>
+			</div>
+		</div>
+		<div class="report">
+			<div class='title'>上报数据</div>
+			<div class='detail'>一段时间后，上报数据</div>
+			<div class='seconds'>20min</div>
+			<div class='stripT'>
+				<div class="chooseStripT">
+					<img class='chooseStripCircT' src="img/circle_blue.png"/>
+				</div>
+			</div>
+		</div>
+		<div class='setUp'>
+			<div class='setUptitle'>电源</div>
+			<div class='Button'>
+				<div class='ButtonShadow'></div>
+				<div id='ButtonCir'></div>
+			</div>
+		</div>
+		<div id='submit'>保&nbsp;&nbsp;&nbsp;存</div>
+		<div class='prompt'>设置成功</div>
+	</body>
+	<script>
+		var chooseStripCirc=document.getElementsByClassName('chooseStripCirc'),
+		time = document.getElementsByClassName('time')
+		chooseStrip=document.getElementsByClassName('chooseStrip'),
+		chooseStripCircT=document.getElementsByClassName('chooseStripCircT'),
+		seconds = document.getElementsByClassName('seconds')
+		chooseStripT=document.getElementsByClassName('chooseStripT'),
+		ButtonCir=document.getElementById('ButtonCir'),
+		bigWidth = 5.5/7.5*document.documentElement.clientWidth
+		
+		var hours = 12,
+		minutes = 20,
+		state = 0, //0为电源关，1为开
+		tosubmit = false
+
+		//动画开始
+		chooseStripCirc[0].addEventListener('touchmove',function(e) {
+			let move = e.changedTouches[0].clientX - 1/7.5*document.documentElement.clientWidth; 
+			if (move>=0 && move<=5.5/7.5*document.documentElement.clientWidth){
+				move = move
+			}else if(move<0){
+				move = 0
+			}else{
+				move=5.5/7.5*document.documentElement.clientWidth
+			}
+			chooseStripCirc[0].style.left = -0.24/7.5*document.documentElement.clientWidth + move + 'px'
+			chooseStrip[0].style.width = move + 'px';
+			time[0].innerHTML = parseInt(move/bigWidth*24)+"h";
+			hours = parseInt(move/bigWidth*24)
+			tosubmit = true
+			document.getElementById('submit').style.backgroundColor='rgb(1,144,210)';
+		})
+		
+		chooseStripCircT[0].addEventListener('touchmove',function(e) {
+			let move = e.changedTouches[0].clientX - 1/7.5*document.documentElement.clientWidth; 
+			if (move>=0 && move<=5.5/7.5*document.documentElement.clientWidth){
+				move = move
+			}else if(move<0){
+				move = 0
+			}else{
+				move=5.5/7.5*document.documentElement.clientWidth
+			}
+			chooseStripCircT[0].style.left = -0.24/7.5*document.documentElement.clientWidth + move + 'px'
+			chooseStripT[0].style.width = move + 'px';
+			document.getElementById('submit').style.backgroundColor='rgb(1,144,210)';
+			seconds[0].innerHTML = parseInt(move/bigWidth*120) * 0.5 +"min";
+			minutes = parseInt(move/bigWidth*120) * 0.5
+			tosubmit = true
+		})
+		
+		ButtonCir.addEventListener('touchend',function(e){
+			document.getElementById('submit').style.backgroundColor='rgb(1,144,210)';
+			tosubmit = true
+			var buttons = parseFloat(window.getComputedStyle(document.getElementsByClassName('ButtonShadow')[0]).width.replace('px',''))
+			var bigbuttons = window.getComputedStyle(document.getElementsByClassName('Button')[0]).width.replace('px','')
+			if (buttons == 0){
+				var timer = setInterval(function(){
+					buttons+=3
+					document.getElementsByClassName('ButtonShadow')[0].style.width = buttons + 'px'
+					ButtonCir.style.left = buttons - 0.28/7.5*document.documentElement.clientWidth + 'px'
+					if(parseFloat(window.getComputedStyle(document.getElementsByClassName('ButtonShadow')[0]).width.replace('px','')) >= bigbuttons){
+						document.getElementsByClassName('ButtonShadow')[0].style.width = bigbuttons + 'px'
+						ButtonCir.style.left = bigbuttons - 0.28/7.5*document.documentElement.clientWidth + 'px'
+						clearInterval(timer)
+						state = 1
+					}
+				},1)
+			}else{
+				var timer = setInterval(function(){
+					buttons-=3
+					document.getElementsByClassName('ButtonShadow')[0].style.width = buttons + 'px'
+					ButtonCir.style.left = buttons - 0.28/7.5*document.documentElement.clientWidth + 'px'
+					if(parseFloat(window.getComputedStyle(document.getElementsByClassName('ButtonShadow')[0]).width.replace('px','')) <= 3){
+						document.getElementsByClassName('ButtonShadow')[0].style.width = '0px'
+						ButtonCir.style.left = - 0.28/7.5*document.documentElement.clientWidth + 'px'
+						clearInterval(timer)
+						state = 0
+					}
+				},1)
+			}
+		})
+		//动画结束
+		
+		document.getElementById('submit').addEventListener('touchstart',function() {
+			if (tosubmit){
+				console.log(hours,minutes,state) // 此时提交数据
+				if (true){
+					document.getElementsByClassName('prompt')[0].style.display='block'
+					tosubmit = false
+					document.getElementById('submit').style.backgroundColor='rgb(167,167,167)';
+					setTimeout(function(){
+						document.getElementsByClassName('prompt')[0].style.display='none'
+					},1000)
+				}
+			}
+		});
+	</script>
+</html>
+

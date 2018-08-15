@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>模拟qq左滑删除功能组件</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"><!--如不加此行则测出的clientWidth为980-->
+		<script>
+			var fun = function (doc, win) {
+			    var docEl = doc.documentElement,
+			        resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+			        recalc = function () {
+			            var clientWidth = docEl.clientWidth; 
+			            if (!clientWidth) return;
+			            //这里是假设在750px宽度设计稿的情况下，1rem = 100px；
+			            //可以根据实际需要修改
+			            docEl.style.fontSize = 100 * (clientWidth / 750) + 'px';
+			        };
+			    if (!doc.addEventListener) return;
+			    win.addEventListener(resizeEvt, recalc, false);
+			    doc.addEventListener('DOMContentLoaded', recalc, false);
+			}
+			fun(document, window);
+		</script>
+		<style>
+			html,
+			body {
+				background-color: rgb(238, 238, 238);
+				width: 100%
+			}
+			body{
+				margin:0
+			}
+			.equipmentliout {
+				position: relative;
+				height: 2.74rem;
+				width: 100%;
+				overflow: scroll;
+				background-color: #fff;
+				margin-bottom: 0.2rem;
+			}
+			
+			.equipmentliinner {
+				position: absolute;
+				left: 0;
+				display: flex;
+				height: 2.74rem;
+				width: 9.1rem
+			}
+			
+			.equipmentliinnerL {
+				position: relative;
+				height: 2.74rem;
+				width: 7.5rem;
+				/*padding: 0.2rem 0;*/
+			}
+			
+			.equipmentliinnerLT,
+			.equipmentliinnerLB {
+				width: 6rem;
+				height: 1.16rem;
+				margin-left: 0.4rem;
+			}
+			
+			.equipmentliinnerLT {
+				border-bottom: 0.02rem solid rgb(238, 238, 238);
+				margin-top: 0.2rem;
+			}
+			
+			.equipmentliinnerLr {
+				position: absolute;
+				width: 0.08rem;
+				height: 1.2rem;
+				background-color: rgb(255, 51, 51);
+				top: 0.77rem;
+				right: 0;
+			}
+			
+			.equipmentliinnerR {
+				/*padding: 0.5rem 0;*/
+				height: 2.74rem;
+				width: 1.6rem;
+				background-color: rgb(255, 51, 51);
+				font-size: 0.44rem;
+				color: #fff;
+				display: flex;
+				flex-direction: column;
+				justify-content: space-around;
+				align-items: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="equipmentliout">
+			<div class="equipmentliinner">
+				<div class="equipmentliinnerL">
+					<div class="equipmentliinnerLT"></div>
+					<div class="equipmentliinnerLB"></div>
+					<div class="equipmentliinnerLr"></div>
+				</div>
+				<div class="equipmentliinnerR">
+					<span>删</span>
+					<span>除</span>
+				</div>
+			</div>
+		</div>
+		<div class="equipmentliout">
+			<div class="equipmentliinner">
+				<div class="equipmentliinnerL">
+					<div class="equipmentliinnerLT"></div>
+					<div class="equipmentliinnerLB"></div>
+					<div class="equipmentliinnerLr"></div>
+				</div>
+				<div class="equipmentliinnerR">
+					<span>删</span>
+					<span>除</span>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		var start = 0,
+		end = 0,
+		equipmentliinner = document.getElementsByClassName('equipmentliinner'),
+		equipmentliinnerLr = document.getElementsByClassName('equipmentliinnerLr'),
+		equipmentliinnerR = document.getElementsByClassName('equipmentliinnerR'),//删除列表
+		left,
+		bigleft = document.documentElement.clientWidth / 7.5 * 1.6;
+		
+		for(var i = 0; i < equipmentliinner.length; i++){
+			equipmentliinner[i].n = i
+			equipmentliinnerR[i].m = i
+			equipmentliinner[i].addEventListener('touchstart',function(e){
+				start = e.changedTouches[0].clientX
+				left = parseFloat(window.getComputedStyle(equipmentliinner[this.n]).left.replace('px',''))
+			})
+			equipmentliinner[i].addEventListener('touchmove',function(e){
+				e.preventDefault()
+			})
+			equipmentliinner[i].addEventListener('touchend',function(e){
+				end = e.changedTouches[0].clientX
+				if (left == 0 && end - start < 0){
+					move(left, this.n)
+				} else if(left <= parseInt(-bigleft) && end - start > 0){
+					move(left, this.n)
+				}
+			})
+			equipmentliinnerR[i].addEventListener('touchend',function(e){  //删除功能
+				console.log(this.m)
+			})
+		}
+		
+		function move(Left, n){
+			var timer,
+			step = bigleft / 50
+			if(Left == 0){
+				equipmentliinnerLr[n].style.display = 'none'
+				timer = setInterval(function(){
+					Left -= step
+					equipmentliinner[n].style.left = Left + 'px'
+					if(parseFloat(window.getComputedStyle(equipmentliinner[n]).left.replace('px','')) <= -bigleft){
+						equipmentliinner[n].style.left = -bigleft + 'px'
+						clearInterval(timer)
+					}
+				},1)
+				for (var i = 0; i < equipmentliinner.length; i++) {
+					if (i !=n && window.getComputedStyle(equipmentliinner[i]).left.replace('px','') <= -bigleft+1){
+						var otherele = equipmentliinner[i]
+						var otherelezi = equipmentliinnerLr[i]
+						var otherLeft = parseFloat(window.getComputedStyle(otherele).left.replace('px',''))
+						var otherTimer = setInterval(function(){
+							otherLeft += step
+							otherele.style.left = otherLeft + 'px'
+							if(parseFloat(window.getComputedStyle(otherele).left.replace('px','')) >= 0){
+								otherele.style.left = '0px'
+								otherelezi.style.display = 'block'
+								clearInterval(otherTimer)
+							}
+						},1)
+					}
+				}
+			}else if(left <= parseInt(-bigleft)){
+				timer = setInterval(function(){
+					Left += step
+					equipmentliinner[n].style.left = Left + 'px'
+					if(parseFloat(window.getComputedStyle(equipmentliinner[n]).left.replace('px','')) >= 0){
+						equipmentliinner[n].style.left = '0px'
+						equipmentliinnerLr[n].style.display = 'block'
+						clearInterval(timer)
+					}
+				},1)
+			}
+		}
+	</script>
+</html>
