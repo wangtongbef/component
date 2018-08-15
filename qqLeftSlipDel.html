@@ -97,7 +97,7 @@
 					<div class="equipmentliinnerLB"></div>
 					<div class="equipmentliinnerLr"></div>
 				</div>
-				<div class="equipmentliinnerR">
+				<div class="equipmentliinnerR" data-id='111'>
 					<span>删</span>
 					<span>除</span>
 				</div>
@@ -110,7 +110,7 @@
 					<div class="equipmentliinnerLB"></div>
 					<div class="equipmentliinnerLr"></div>
 				</div>
-				<div class="equipmentliinnerR">
+				<div class="equipmentliinnerR" data-id='131'>
 					<span>删</span>
 					<span>除</span>
 				</div>
@@ -142,10 +142,14 @@
 					move(left, this.n)
 				} else if(left <= parseInt(-bigleft) && end - start > 0){
 					move(left, this.n)
+				} else if(left == 0 && end - start == 0){
+					console.log('tiaozhuan',this.n) //点击跳转详情页
 				}
 			})
 			equipmentliinnerR[i].addEventListener('touchend',function(e){  //删除功能
 				console.log(this.m)
+				console.log(this.getAttribute("data-id"))
+				this.getAttribute("data-id") //点击获取删除键绑定之属性
 			})
 		}
 		
